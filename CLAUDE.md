@@ -2,7 +2,7 @@
 
 Web estática para la porra de **los amigos** de Víctor y Adriana sobre el día de nacimiento de Catalina, su hija. Adriana sale de cuentas el **30 de diciembre de 2026**. La web se publica en **GitHub Pages** y se comparte por WhatsApp con los amigos, así que la mayoría la abrirá en el **móvil**. Tiene que ser muy legible y sin fricción.
 
-Es una copia de la porra de la familia, que está en `../catalina`. Las dos comparten diseño y código; cambian los participantes, la descripción («La porra de los amigos») y, en la rama `envio-apuestas`, el **envío de apuestas desde la web** (solo existe aquí). Si se cambia el diseño o el código común en una, conviene llevarlo también a la otra. Aquí no debe aparecer nada de la familia.
+Es una copia de la porra de la familia, que está en `../catalina`. Las dos comparten diseño y código; cambian los participantes, la descripción («La porra de los amigos») y el **envío de apuestas desde la web** (solo existe aquí). Si se cambia el diseño o el código común en una, conviene llevarlo también a la otra. Aquí no debe aparecer nada de la familia.
 
 Idioma: todo en **español de España**, tanto el contenido como los comentarios del código. El trato con el usuario (Víctor) también es en español.
 
@@ -73,10 +73,10 @@ Los nombres deben escribirse con tilde (Jesús, Víctor). Si dos amigos se llama
 - El subrayado amarillo va en un `span` inline con `box-decoration-break: clone` para que marque todas las líneas de un nombre largo como «Ana (prima)».
 - En la cabecera hay una ecografía (`assets/ecografia.mp4`, `autoplay muted loop playsinline`) pegada con celo, a la derecha en escritorio y bajo el texto en tablet y móvil.
 
-### Envío de apuestas (rama `envio-apuestas`)
+### Envío de apuestas
 - Botón «Apuntar mi apuesta» en la cabecera (solo antes de nacer y con `envio.worker` relleno). Abre un `<dialog>` con nombre, día (del rango, desde hoy) y foto. Avisa de que **Adriana y Víctor revisarán cada apuesta**.
 - La foto se recorta en el navegador con `<canvas>`: cuadrado centrado con la cara algo por encima del centro, se puede arrastrar (o mover con flechas) y acercar. Se envía como JPEG 160×160 (~10 KB), sin EXIF.
-- El Worker (`worker/worker.js`) valida todo de nuevo, comprueba Turnstile y abre un pull request contra `AJUSTES.rama` con los dos archivos en `apuestas/`. Al hacer Merge, `GET /apuestas` la devuelve y la web la añade a las de `CONFIG` (`setPeople` + `pintar`). Si el Worker no responde, se ven solo las de `CONFIG`.
+- El Worker (`worker/worker.js`) valida todo de nuevo, comprueba Turnstile y abre un pull request contra `AJUSTES.rama` (`main`) con los dos archivos en `apuestas/`. Al hacer Merge, `GET /apuestas` la devuelve y la web la añade a las de `CONFIG` (`setPeople` + `pintar`). Si el Worker no responde, se ven solo las de `CONFIG`.
 - Nombres repetidos (sin tildes ni mayúsculas) se rechazan en la web y en el Worker; los de `CONFIG` tienen prioridad.
 - Pruebas del Worker: se puede importar en Node 22 y llamar a `worker.fetch(request, env)` simulando `fetch` de GitHub y Turnstile.
 

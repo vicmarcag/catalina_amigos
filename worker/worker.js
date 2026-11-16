@@ -15,7 +15,7 @@
 
 const AJUSTES = {
   repo: "vicmarcag/catalina_amigos",
-  rama: "envio-apuestas",          // rama donde se guardan las apuestas aprobadas; al terminar las pruebas, "main"
+  rama: "main",                    // rama donde se guardan las apuestas aprobadas (la que publica GitHub Pages)
   origenes: ["https://vicmarcag.github.io"],   // webs que pueden usar este Worker
   desde: "2026-12-14",             // días en los que se puede apostar
   hasta: "2027-01-10",

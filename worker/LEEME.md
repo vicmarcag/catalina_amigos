@@ -62,18 +62,12 @@ Las dos son públicas, así que no pasa nada por subirlas a GitHub.
   - Si Adriana tiene cuenta de GitHub, añádela en **Settings → Collaborators** y pon su usuario en `revisores`, al principio de `worker.js`. Le llegará un aviso con cada apuesta.
   - Si no, revisa de vez en cuando la pestaña **Pull requests** del repositorio en la app de GitHub.
 
-## 6. Probar en la rama `envio-apuestas`
+## 6. Día a día
 
-1. **Settings → Pages:** cambia la rama a `envio-apuestas`, carpeta `/ (root)`.
-2. Abre la web, pulsa «Apuntar mi apuesta» y envía una de prueba.
-3. En GitHub aparecerá un pull request «Apuesta de …» con la foto. Pulsa **Merge** y, al recargar la web, saldrá en el calendario.
-4. Para quitar una apuesta de prueba ya aprobada, borra sus dos archivos de `apuestas/`.
-
-## 7. Pasar a producción
-
-1. Fusiona `envio-apuestas` en `main`.
-2. En `worker.js`, cambia `rama: "envio-apuestas"` por `rama: "main"` y vuelve a pegarlo en Cloudflare (**Deploy**).
-3. **Settings → Pages:** vuelve a poner `main`.
+- Cada apuesta llega como un pull request «Apuesta de …» con la foto. Si está bien, **Merge**; si no, ciérralo sin fusionar.
+- Para quitar una apuesta ya aprobada, borra sus dos archivos de `apuestas/` en `main`.
+- Si cambias `worker.js`, vuelve a pegarlo en Cloudflare (**Edit code** → **Deploy**). Los secretos se conservan.
+- Se probó en la rama `envio-apuestas` y se fusionó en `main` el 16 de noviembre de 2026. El Worker lee y escribe en `main`, que es la rama que publica GitHub Pages.
 
 ## Qué protege a la porra
 
