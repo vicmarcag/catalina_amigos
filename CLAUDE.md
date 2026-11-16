@@ -43,19 +43,21 @@ Está al principio del `<script>` en `index.html`. Es lo único que debería hac
 | `envio` | `{ worker, turnstile }`: URL del Worker y *site key* de Turnstile (las dos públicas). Si `worker` está vacío no hay botón ni se piden apuestas al Worker. |
 | `fiestas` | Días señalados, con una etiqueta de texto en la celda. |
 
-Participantes actuales (8):
+Participantes actuales (10):
 
 | Fecha | Nombres |
 |---|---|
 | 27 dic | Adriana |
+| 29 dic | Cristóbal |
 | 31 dic | Jesús |
 | 1 ene | Víctor, Samuel |
 | 2 ene | Noe |
+| 3 ene | Javy |
 | 4 ene | Miguel |
 | 5 ene | Alba |
 | 6 ene | Robe |
 
-Los nombres deben escribirse con tilde (Jesús, Víctor). Si dos amigos se llaman igual, se distinguen con un paréntesis, p. ej. «Ana (prima)».
+Los nombres deben escribirse con tilde (Cristóbal, Jesús, Víctor). Si dos amigos se llaman igual, se distinguen con un paréntesis, p. ej. «Ana (prima)».
 
 ## Comportamiento
 
