@@ -40,7 +40,7 @@ Está al principio del `<script>` en `index.html`. Es lo único que debería hac
 | `rango` | `{ desde, hasta }`: días que se ven siempre en el calendario (ahora del 14 dic al 10 ene). |
 | `fiestas` | Días señalados, con una etiqueta de texto en la celda. |
 
-Participantes actuales (6):
+Participantes actuales (7):
 
 | Fecha | Nombres |
 |---|---|
@@ -48,6 +48,7 @@ Participantes actuales (6):
 | 31 dic | Jesús |
 | 1 ene | Víctor |
 | 2 ene | Noe |
+| 4 ene | Miguel |
 | 5 ene | Alba |
 | 6 ene | Robe |
 
