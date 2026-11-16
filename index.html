@@ -41,9 +41,10 @@
   h1{font:800 clamp(2.5rem,6vw,4.2rem)/.95 var(--display);letter-spacing:-.025em;margin:0 0 20px;max-width:12ch;text-wrap:balance}
   .status{font-size:1.25rem;margin:0 0 6px;max-width:40ch}
   .sub{color:var(--muted);margin:0;max-width:44ch}
-  .print{margin-top:20px;font:700 1rem var(--text);color:var(--white);background:var(--ink);border:0;border-radius:8px;padding:12px 18px;cursor:pointer}
-  .print:hover{background:#2c3c63}
-  .print:active{transform:translateY(1px)}
+  .btn{margin-top:20px;font:700 1rem var(--text);color:var(--white);background:var(--ink);border:0;border-radius:8px;padding:12px 18px;cursor:pointer}
+  .btn:hover{background:#2c3c63}
+  .btn:active{transform:translateY(1px)}
+  .btn:disabled{opacity:.6;cursor:wait}
 
   /* La ecografía pegada en la nevera con un trozo de celo */
   .eco{position:relative;margin:0 0 6px;justify-self:end;width:100%;transform:rotate(2.5deg)}
@@ -56,6 +57,40 @@
     .hang{animation:sway 2.6s cubic-bezier(.3,.7,.4,1) both}
     @keyframes sway{0%{transform:rotate(-6deg)}35%{transform:rotate(4deg)}65%{transform:rotate(-1.5deg)}100%{transform:rotate(0)}}
   }
+
+  /* ---------- Formulario para enviar apuestas ---------- */
+  .envio{width:min(460px,calc(100% - 24px));max-height:calc(100dvh - 24px);padding:0;border:0;border-top:2px solid var(--ink);background:var(--paper);color:var(--ink)}
+  .envio::backdrop{background:rgba(30,43,74,.55)}
+  .envio form{padding:22px 20px 20px}
+  .envio h2{margin:0 0 8px}
+  .envio-nota{margin:0 0 20px;color:var(--muted)}
+  .campo{margin-bottom:18px}
+  .campo>label,.campo>.etq{display:block;font-weight:700;margin-bottom:6px}
+  .envio input[type=text],.envio select{width:100%;font:inherit;font-size:1.0625rem;color:var(--ink);background:var(--white);border:2px solid var(--rule);border-radius:8px;padding:11px 12px}
+  .envio input[type=text]:focus,.envio select:focus{border-color:var(--ink)}
+  .hint{margin:6px 0 0;font-size:.9rem;color:var(--muted)}
+  .foto{display:flex;gap:16px;align-items:center}
+  .crop{position:relative;flex:none;width:132px;height:132px;border-radius:50%;border:2px dashed var(--muted);background:var(--white);overflow:hidden;display:grid;place-items:center;color:var(--muted);font-size:.9rem;text-align:center}
+  .crop canvas{position:absolute;inset:0;width:100%;height:100%;opacity:0;touch-action:none;cursor:grab}
+  .crop.lleno{border:2px solid var(--ink)}
+  .crop.lleno canvas{opacity:1}
+  .crop canvas:active{cursor:grabbing}
+  .foto-ctrl{flex:1;min-width:0}
+  .btn-sec{display:inline-block;font:700 1rem var(--text);color:var(--ink);background:transparent;border:2px solid var(--ink);border-radius:8px;padding:10px 16px;cursor:pointer}
+  .btn-sec:hover{background:var(--white)}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .sr:focus-visible+label{outline:3px solid var(--pen);outline-offset:3px}
+  .zoom{display:block;margin-top:12px;font-size:.9rem;color:var(--muted)}
+  .zoom input{display:block;width:100%;accent-color:var(--ink);margin:4px 0 0}
+  #ts:empty{display:none}
+  #ts{margin:0 0 14px}
+  .msg{margin:0 0 16px}
+  .msg:empty{display:none}
+  .msg.error{color:var(--pen);font-weight:700}
+  .msg.ok{font-size:1.125rem}
+  .acciones{display:flex;gap:12px;justify-content:flex-end;align-items:center;flex-wrap:wrap}
+  .acciones .btn{margin:0}
+  .envio form.hecho .campos,.envio form.hecho .envio-nota,.envio form.hecho #envioOk{display:none}
 
   /* ---------- Calendario de nevera ---------- */
   .cal-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 24px;margin-bottom:14px}
@@ -144,7 +179,8 @@
       <h1 id="title">¿Qué día nacerá Catalina?</h1>
       <p id="status" class="status"></p>
       <p id="sub" class="sub"></p>
-      <button id="print" class="print" type="button" hidden>Imprimir el cartel</button>
+      <button id="apostar" class="btn" type="button" hidden>Apuntar mi apuesta</button>
+      <button id="print" class="btn" type="button" hidden>Imprimir el cartel</button>
     </div>
     <figure class="eco">
       <div class="eco-print">
@@ -168,6 +204,42 @@
   </section>
 </main>
 
+<dialog id="envio" class="envio" aria-labelledby="envio-title">
+  <form id="envioForm" novalidate>
+    <h2 id="envio-title">Tu apuesta</h2>
+    <p class="envio-nota">Adriana y Víctor revisarán cada apuesta antes de que aparezca en el calendario.</p>
+    <div class="campos">
+      <div class="campo">
+        <label for="fNombre">Nombre</label>
+        <input id="fNombre" type="text" maxlength="24" autocomplete="given-name" required>
+        <p class="hint">Como te conocemos. Si hay alguien con tu mismo nombre, añade la inicial del apellido.</p>
+      </div>
+      <div class="campo">
+        <label for="fFecha">Día</label>
+        <select id="fFecha" required><option value="">Elige un día</option></select>
+      </div>
+      <div class="campo">
+        <span class="etq" id="fotoEtq">Foto</span>
+        <div class="foto">
+          <div class="crop" id="crop">Sin foto<canvas id="cropCanvas" width="320" height="320" tabindex="0" role="img" aria-label="Tu foto recortada. Arrástrala o usa las flechas para centrar la cara."></canvas></div>
+          <div class="foto-ctrl">
+            <input id="fFoto" class="sr" type="file" accept="image/*" aria-labelledby="fotoEtq fotoBtn">
+            <label for="fFoto" class="btn-sec" id="fotoBtn">Elegir foto</label>
+            <label class="zoom">Acercar<input id="fZoom" type="range" min="1" max="3" step="0.01" value="1" disabled></label>
+          </div>
+        </div>
+        <p class="hint">Mejor una en la que se te vea bien la cara. Arrástrala dentro del círculo para centrarla.</p>
+      </div>
+      <div id="ts"></div>
+    </div>
+    <p id="envioMsg" class="msg" role="status" aria-live="polite"></p>
+    <div class="acciones">
+      <button type="button" id="envioCancel" class="btn-sec">Cancelar</button>
+      <button type="submit" id="envioOk" class="btn">Enviar apuesta</button>
+    </div>
+  </form>
+</dialog>
+
 <div id="poster" class="poster" aria-hidden="true"></div>
 
 <script>
@@ -180,6 +252,12 @@ const CONFIG = {
   // Días que se ven siempre en el calendario. Si una apuesta o el nacimiento
   // caen fuera, el calendario se amplía solo para incluirlos.
   rango: { desde: "2026-12-14", hasta: "2027-01-10" },
+  // Envío de apuestas desde la web (ver worker/LEEME.md). Si worker está vacío,
+  // no aparece el botón y solo se ven las apuestas de participantes.
+  envio: {
+    worker: "",       // URL del Worker, p. ej. "https://porra-catalina-amigos.TU-SUBDOMINIO.workers.dev"
+    turnstile: "",    // clave del sitio (site key) de Turnstile
+  },
   nacimiento: null,        // cuando nazca: "AAAA-MM-DD", p. ej. "2026-12-28"
   // foto (opcional): ruta a la imagen, p. ej. "assets/fotos/victor.jpg".
   // Mejor cuadrada y pequeña (unos 120×120 px). Sin foto se ve la inicial.
@@ -220,10 +298,18 @@ const today = isISO(Q.get("hoy")) ? Q.get("hoy") : key(new Date());
 const born = isISO(Q.get("nacimiento")) ? Q.get("nacimiento") : CONFIG.nacimiento;
 const B = CONFIG.bebe;
 
-const people = [...CONFIG.participantes].sort((a, b) => a.fecha.localeCompare(b.fecha));
-const byDate = {};
-people.forEach(p => (byDate[p.fecha] = byDate[p.fecha] || []).push(p));
-const winners = born ? people.filter(p => p.fecha === born) : [];
+// Apuestas: las de CONFIG más las aprobadas que llegan del formulario
+let people = [], byDate = {}, winners = [];
+const normal = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+function setPeople(extra = []) {
+  const vistos = new Set(CONFIG.participantes.map(p => normal(p.nombre)));
+  people = [...CONFIG.participantes, ...extra.filter(p => !vistos.has(normal(p.nombre)))]
+    .sort((a, b) => a.fecha.localeCompare(b.fecha));
+  byDate = {};
+  people.forEach(p => (byDate[p.fecha] = byDate[p.fecha] || []).push(p));
+  winners = born ? people.filter(p => p.fecha === born) : [];
+}
+setPeople();
 // Foto de cada participante; si aún no hay foto, un círculo con la inicial
 const avatar = p => p.foto
   ? `<img class="av" src="${esc(p.foto)}" alt="" width="30" height="30" loading="lazy">`
@@ -280,6 +366,8 @@ $("ecoCap").textContent = `${B}, en la ecografía`;
 $("title").textContent = born ? `${B} ya está aquí` : `¿Qué día nacerá ${B}?`;
 let onesieLines = ["?"], onesieFaces = [];
 
+function cabecera() {
+onesieLines = ["?"]; onesieFaces = [];
 if (born) {
   $("status").textContent = `${B} nació el ${long(born)}.`;
   if (winners.length) {
@@ -302,9 +390,10 @@ if (born) {
     `Salíamos de cuentas el ${long(CONFIG.fpp)}. Llevamos ${-d} ${-d === 1 ? "día" : "días"} de propina.`;
   $("sub").textContent = `Imprimiremos un body con la foto y el nombre de quien acierte el día exacto.`;
 }
+}
 
 /* ---------- Calendario ---------- */
-(function calendar() {
+function calendar() {
   const keys = people.map(p => p.fecha).concat(CONFIG.fpp, CONFIG.rango.desde, CONFIG.rango.hasta, born ? [born] : []).sort();
   const first = parse(keys[0]), last = parse(keys[keys.length - 1]);
   // Se ven justo los días del rango; los huecos hasta completar la semana quedan vacíos
@@ -337,16 +426,16 @@ if (born) {
   // En la leyenda, la fecha prevista con su mes: «30 dic.»
   const f = parse(CONFIG.fpp);
   $("keyRing").innerHTML = `${f.getDate()} ${f.toLocaleDateString("es-ES", { month: "short" }).replace(".", "")}.${ring}`;
-})();
+}
 
 /* ---------- Recuento ---------- */
-(function count() {
+function count() {
   const n = people.length, live = people.filter(p => state(p) === "live").length;
   $("count").textContent = born ? `${n} apuestas en total.` :
     live === n ? `Hay ${n} apuestas y todas siguen en juego.` :
     live === 0 ? `Ya no queda ninguna apuesta en juego.` :
     `Siguen en juego ${live} de las ${n} apuestas.`;
-})();
+}
 
 /* ---------- Dibujo y cartel ---------- */
 function render() {
@@ -359,9 +448,147 @@ function render() {
       <p>${winners.length ? (winners.length > 1 ? "Acertaron el día" : "Acertó el día") : "Nadie acertó el día"}<small>${esc(B)}, ${full(born)}</small></p>`;
   }
 }
-render();
+function pintar() { cabecera(); calendar(); count(); render(); }
+pintar();
 (document.fonts ? document.fonts.ready : Promise.resolve()).then(render);
 $("print").addEventListener("click", () => window.print());
+
+/* ---------- Apuestas aprobadas desde el formulario ---------- */
+const ENVIO = CONFIG.envio || {};
+const WORKER = (ENVIO.worker || "").replace(/\/$/, "");
+(async function cargarAprobadas() {
+  if (!WORKER) return;
+  try {
+    const r = await fetch(`${WORKER}/apuestas`);
+    if (!r.ok) return;
+    const lista = await r.json();
+    const validas = (Array.isArray(lista) ? lista : [])
+      .filter(p => p && typeof p.nombre === "string" && isISO(p.fecha) && /^https:\/\//.test(p.foto || ""))
+      .map(p => ({ nombre: p.nombre.slice(0, 24), fecha: p.fecha, foto: p.foto }));
+    setPeople(validas);
+    pintar();
+  } catch (e) {
+    // Si el Worker no responde, se ven solo las apuestas de CONFIG
+  }
+})();
+
+/* ---------- Formulario para enviar apuestas ---------- */
+(function formulario() {
+  const dlg = $("envio"), form = $("envioForm"), sel = $("fFecha");
+  if (!WORKER || born || !dlg.showModal) return;
+  $("apostar").hidden = false;
+
+  // Días en los que aún se puede apostar
+  for (let d = parse(CONFIG.rango.desde); key(d) <= CONFIG.rango.hasta; d = addDays(d, 1)) {
+    if (key(d) >= today) sel.insertAdjacentHTML("beforeend", `<option value="${key(d)}">${long(key(d))}</option>`);
+  }
+
+  const lienzo = $("cropCanvas"), ctx = lienzo.getContext("2d");
+  let foto = null, tsToken = "", tsId = null, arrastre = null;
+  const msg = (t, tipo = "") => { $("envioMsg").textContent = t; $("envioMsg").className = `msg ${tipo}`; };
+
+  $("apostar").addEventListener("click", () => { dlg.showModal(); cargarTurnstile(); });
+  $("envioCancel").addEventListener("click", () => dlg.close());
+  dlg.addEventListener("close", () => {
+    if (!form.classList.contains("hecho")) return;
+    // Tras enviar una, el formulario queda limpio por si alguien más quiere apostar
+    form.reset(); form.classList.remove("hecho"); foto = null;
+    $("crop").classList.remove("lleno"); $("fZoom").disabled = true;
+    $("envioCancel").textContent = "Cancelar"; $("envioOk").disabled = false; msg("");
+  });
+
+  // Turnstile, el captcha de Cloudflare: solo se carga al abrir el formulario
+  function cargarTurnstile() {
+    if (!ENVIO.turnstile || tsId !== null) return;
+    const pintarTs = () => {
+      tsId = turnstile.render("#ts", { sitekey: ENVIO.turnstile, language: "es",
+        callback: t => (tsToken = t), "expired-callback": () => (tsToken = ""), "error-callback": () => (tsToken = "") });
+    };
+    if (window.turnstile) return pintarTs();
+    tsId = "cargando";
+    const s = document.createElement("script");
+    s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+    s.async = true;
+    s.onload = pintarTs;
+    s.onerror = () => { tsId = null; msg("No se ha podido cargar la comprobación antirrobots. Revisa la conexión.", "error"); };
+    document.head.appendChild(s);
+  }
+
+  // La foto se recorta en cuadrado en el propio móvil, con la cara algo por encima del centro
+  $("fFoto").addEventListener("change", e => {
+    const archivo = e.target.files[0];
+    if (!archivo) return;
+    const img = new Image();
+    img.onload = () => {
+      const w = img.naturalWidth, h = img.naturalHeight, l = Math.min(w, h);
+      foto = { img, w, h, zoom: 1, cx: w / 2, cy: h > w ? l / 2 + (h - l) * 0.3 : h / 2 };
+      $("fZoom").value = 1; $("fZoom").disabled = false;
+      $("crop").classList.add("lleno");
+      dibujar(); msg("");
+      URL.revokeObjectURL(img.src);
+    };
+    img.onerror = () => { foto = null; $("crop").classList.remove("lleno"); msg("No hemos podido abrir esa foto. Prueba con otra en JPG o PNG.", "error"); };
+    img.src = URL.createObjectURL(archivo);
+  });
+  const lado = () => Math.min(foto.w, foto.h) / foto.zoom;
+  function dibujar(c = ctx, t = lienzo.width) {
+    const l = lado();
+    foto.cx = Math.min(Math.max(foto.cx, l / 2), foto.w - l / 2);
+    foto.cy = Math.min(Math.max(foto.cy, l / 2), foto.h - l / 2);
+    c.fillStyle = "#fff"; c.fillRect(0, 0, t, t);
+    c.drawImage(foto.img, foto.cx - l / 2, foto.cy - l / 2, l, l, 0, 0, t, t);
+  }
+  $("fZoom").addEventListener("input", e => { if (foto) { foto.zoom = +e.target.value; dibujar(); } });
+  lienzo.addEventListener("pointerdown", e => { if (!foto) return; arrastre = { x: e.clientX, y: e.clientY }; lienzo.setPointerCapture(e.pointerId); });
+  lienzo.addEventListener("pointermove", e => {
+    if (!arrastre) return;
+    const k = lado() / lienzo.getBoundingClientRect().width;
+    foto.cx -= (e.clientX - arrastre.x) * k; foto.cy -= (e.clientY - arrastre.y) * k;
+    arrastre = { x: e.clientX, y: e.clientY };
+    dibujar();
+  });
+  ["pointerup", "pointercancel"].forEach(t => lienzo.addEventListener(t, () => (arrastre = null)));
+  lienzo.addEventListener("keydown", e => {
+    const m = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key];
+    if (!foto || !m) return;
+    e.preventDefault();
+    foto.cx += m[0] * lado() * .05; foto.cy += m[1] * lado() * .05;
+    dibujar();
+  });
+
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    const nombre = $("fNombre").value.trim().replace(/\s+/g, " "), fecha = sel.value;
+    if (!/^\p{L}[\p{L} .'’()-]{0,23}$/u.test(nombre)) { msg("Escribe tu nombre con letras (máximo 24).", "error"); return $("fNombre").focus(); }
+    const repe = people.find(p => normal(p.nombre) === normal(nombre));
+    if (repe) { msg(`Ya hay una apuesta a nombre de «${repe.nombre}». Si eres otra persona, añade la inicial de tu apellido.`, "error"); return $("fNombre").focus(); }
+    if (!fecha) { msg("Elige el día.", "error"); return sel.focus(); }
+    if (!foto) { msg("Elige una foto.", "error"); return $("fFoto").focus(); }
+    if (ENVIO.turnstile && !tsToken) return msg("Espera un momento a que termine la comprobación antirrobots.", "error");
+
+    const c = document.createElement("canvas");
+    c.width = c.height = 160;
+    dibujar(c.getContext("2d"), 160);
+    const jpg = c.toDataURL("image/jpeg", .86).split(",")[1];
+    $("envioOk").disabled = true;
+    msg("Enviando…");
+    try {
+      const r = await fetch(`${WORKER}/apuesta`, { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nombre, fecha, foto: jpg, turnstile: tsToken }) });
+      const datos = await r.json().catch(() => ({}));
+      if (!r.ok || !datos.ok) throw new Error(datos.error || "No se ha podido enviar. Vuelve a intentarlo.");
+      form.classList.add("hecho");
+      msg(`¡Recibida! Adriana y Víctor revisarán tu apuesta para el ${long(fecha)} y aparecerá en el calendario cuando la aprueben.`, "ok");
+      $("envioCancel").textContent = "Cerrar";
+      $("envioCancel").focus();
+    } catch (err) {
+      msg(err instanceof TypeError ? "No hay conexión con el servidor. Vuelve a intentarlo en un momento." : err.message, "error");
+      $("envioOk").disabled = false;
+    } finally {
+      if (window.turnstile && tsId && tsId !== "cargando") { turnstile.reset(tsId); tsToken = ""; }
+    }
+  });
+})();
 </script>
 </body>
 </html>

@@ -2,7 +2,7 @@
 
 Web estática para la porra de **los amigos** de Víctor y Adriana sobre el día de nacimiento de Catalina, su hija. Adriana sale de cuentas el **30 de diciembre de 2026**. La web se publica en **GitHub Pages** y se comparte por WhatsApp con los amigos, así que la mayoría la abrirá en el **móvil**. Tiene que ser muy legible y sin fricción.
 
-Es una copia de la porra de la familia, que está en `../catalina`. Las dos comparten diseño y código; solo cambian los participantes y la descripción («La porra de los amigos»). Si se cambia el diseño o el código en una, conviene llevarlo también a la otra. Aquí no debe aparecer nada de la familia.
+Es una copia de la porra de la familia, que está en `../catalina`. Las dos comparten diseño y código; cambian los participantes, la descripción («La porra de los amigos») y, en la rama `envio-apuestas`, el **envío de apuestas desde la web** (solo existe aquí). Si se cambia el diseño o el código común en una, conviene llevarlo también a la otra. Aquí no debe aparecer nada de la familia.
 
 Idioma: todo en **español de España**, tanto el contenido como los comentarios del código. El trato con el usuario (Víctor) también es en español.
 
@@ -21,11 +21,13 @@ index.html   ← toda la web: HTML + CSS + JS en un único archivo, sin build ni
 assets/      ← ecografia.mp4 (vídeo en bucle, sin audio, ~370 KB), ecografia.jpg (póster), video.mp4 (original, ignorado en `.gitignore`)
              fotos/ (fotos de participantes ya recortadas: 160×160 JPG, nombre sin tildes, p. ej. jose.jpg)
              img/ (originales que pasa Víctor, ignorados en `.gitignore`; se recortan con ffmpeg a fotos/: `crop=300:300:68:60,scale=160:160` sobre originales de 436 px; si la cara está más arriba o más grande, `crop=340:340:48:30`. Revisar siempre que la cara quede centrada en el círculo)
+apuestas/    ← apuestas aprobadas desde el formulario: <fecha>-<slug>-<4 letras>.json (nombre y día) + .jpg (foto 160×160). Las crea el Worker.
+worker/      ← worker.js (Worker de Cloudflare) y LEEME.md (cómo montarlo, paso a paso)
 README.md    ← instrucciones para publicar y mantener (orientado a personas)
 CLAUDE.md    ← este archivo
 ```
 
-No hay build, framework ni npm. Hay que mantenerlo así: un solo archivo que se pueda editar desde la interfaz web de GitHub. La única carga externa son las fuentes de Google Fonts. Si fallan, la web funciona igual con la fuente del sistema.
+No hay build, framework ni npm. Hay que mantenerlo así: un solo archivo que se pueda editar desde la interfaz web de GitHub. Las cargas externas son las fuentes de Google Fonts y, solo si `CONFIG.envio.worker` está relleno, el Worker y el script de Turnstile (este último solo al abrir el formulario). Si fallan, la web funciona igual: fuente del sistema y solo las apuestas de `CONFIG.participantes`.
 
 ## Datos: el objeto `CONFIG`
 
@@ -38,6 +40,7 @@ Está al principio del `<script>` en `index.html`. Es lo único que debería hac
 | `nacimiento` | `null` hasta que nazca. Después, `"AAAA-MM-DD"`. Este campo cambia todo el estado de la página. |
 | `participantes` | `{ nombre, fecha, foto? }` con fechas ISO. El orden no importa porque se ordenan por fecha. `foto` es opcional (`"assets/fotos/x.jpg"`, cuadrada, ~120 px); sin ella se ve un círculo rosa con la inicial. |
 | `rango` | `{ desde, hasta }`: días que se ven siempre en el calendario (ahora del 14 dic al 10 ene). |
+| `envio` | `{ worker, turnstile }`: URL del Worker y *site key* de Turnstile (las dos públicas). Si `worker` está vacío no hay botón ni se piden apuestas al Worker. |
 | `fiestas` | Días señalados, con una etiqueta de texto en la celda. |
 
 Participantes actuales (8):
@@ -69,6 +72,13 @@ Los nombres deben escribirse con tilde (Jesús, Víctor). Si dos amigos se llama
 - Cada nombre lleva su foto (o la inicial). Cuando ese día ya ha pasado (`out`), la foto se pone en gris; la de quien gana lleva un aro amarillo.
 - El subrayado amarillo va en un `span` inline con `box-decoration-break: clone` para que marque todas las líneas de un nombre largo como «Ana (prima)».
 - En la cabecera hay una ecografía (`assets/ecografia.mp4`, `autoplay muted loop playsinline`) pegada con celo, a la derecha en escritorio y bajo el texto en tablet y móvil.
+
+### Envío de apuestas (rama `envio-apuestas`)
+- Botón «Apuntar mi apuesta» en la cabecera (solo antes de nacer y con `envio.worker` relleno). Abre un `<dialog>` con nombre, día (del rango, desde hoy) y foto. Avisa de que **Adriana y Víctor revisarán cada apuesta**.
+- La foto se recorta en el navegador con `<canvas>`: cuadrado centrado con la cara algo por encima del centro, se puede arrastrar (o mover con flechas) y acercar. Se envía como JPEG 160×160 (~10 KB), sin EXIF.
+- El Worker (`worker/worker.js`) valida todo de nuevo, comprueba Turnstile y abre un pull request contra `AJUSTES.rama` con los dos archivos en `apuestas/`. Al hacer Merge, `GET /apuestas` la devuelve y la web la añade a las de `CONFIG` (`setPeople` + `pintar`). Si el Worker no responde, se ven solo las de `CONFIG`.
+- Nombres repetidos (sin tildes ni mayúsculas) se rechazan en la web y en el Worker; los de `CONFIG` tienen prioridad.
+- Pruebas del Worker: se puede importar en Node 22 y llamar a `worker.fetch(request, env)` simulando `fetch` de GitHub y Turnstile.
 
 ### Calendario
 - El calendario va exactamente desde la primera fecha relevante hasta la última. Las fechas relevantes son `CONFIG.rango` (14 dic a 10 ene), las apuestas, la `fpp` y el nacimiento, de modo que una apuesta o un nacimiento fuera del rango lo amplía. En escritorio, los huecos para completar la primera y la última semana son celdas `.pad` vacías, que en móvil se ocultan.
@@ -117,6 +127,7 @@ Después de cada cambio, renderizar con Playwright (Chromium) y revisar estos ca
 - Móvil a 390 px: con `?hoy=2026-12-26` y con `?nacimiento=2026-12-26` (nadie acierta).
 - `page.pdf(format="A4")` con nacimiento definido, para comprobar que el nombre cabe dentro del body en el cartel.
 - Que no haya errores de JS (`pageerror`).
+- Con `envio.worker` relleno en una copia temporal y el Worker y Turnstile simulados con `page.route`: abrir el formulario, rechazar un nombre repetido, subir una foto vertical, enviar y comprobar que llega un JPEG de 160×160.
 
 ## Publicación
 
