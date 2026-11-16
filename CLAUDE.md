@@ -40,13 +40,13 @@ Está al principio del `<script>` en `index.html`. Es lo único que debería hac
 | `rango` | `{ desde, hasta }`: días que se ven siempre en el calendario (ahora del 14 dic al 10 ene). |
 | `fiestas` | Días señalados, con una etiqueta de texto en la celda. |
 
-Participantes actuales (7):
+Participantes actuales (8):
 
 | Fecha | Nombres |
 |---|---|
 | 27 dic | Adriana |
 | 31 dic | Jesús |
-| 1 ene | Víctor |
+| 1 ene | Víctor, Samuel |
 | 2 ene | Noe |
 | 4 ene | Miguel |
 | 5 ene | Alba |
@@ -77,7 +77,7 @@ Los nombres deben escribirse con tilde (Jesús, Víctor). Si dos amigos se llama
 
 ### El body (SVG)
 - La silueta es el path `BODY` (viewBox `0 0 240 262`) y se dibuja con `drawOnesie(svg, lines)`. Lleva una costura discontinua recortada con `clipPath`, broches y dos pinzas de tender.
-- Tras el nacimiento, `drawOnesie(svg, lines, faces)` pone en el pecho la foto de cada ganador (o su inicial en un círculo blanco) y el nombre debajo. Con un solo ganador, la foto es más grande y un nombre con paréntesis se parte en dos líneas. Si nadie acierta, no hay foto.
+- Tras el nacimiento, `drawOnesie(svg, lines, faces)` pone en el pecho la foto de cada ganador (o su inicial en un círculo blanco) y el nombre debajo. Con un solo ganador, la foto es más grande. Los nombres con paréntesis se parten en dos líneas. Si nadie acierta, no hay foto.
 - `fitText` ajusta el tamaño del texto para que quepa dentro, midiendo con `getComputedTextLength`. Por eso se vuelve a ejecutar tras `document.fonts.ready`.
 - **El cartel de impresión** (`#poster`, visible solo en `@media print`, A4 vertical) **clona el SVG ya ajustado** de la cabecera, renombrando los ids de los `clipPath` (`onesie-` → `poster-`). No se dibuja de cero porque un SVG oculto no se puede medir y el texto se saldría del body.
 
